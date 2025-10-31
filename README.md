@@ -31,3 +31,10 @@ Pacote
 
 -> Campo para converter bytes para os endereços IPs
 
+-----------------------------
+
+Bibliotecas: 
+
+-> Linux: libpcap
+
+-> Windows: npcap
