@@ -24,6 +24,8 @@ função main:
 
 -> Campo para cabeçalhos (demais informações como endereço e destino)
 
+----------------------------
+
 -> ConversorDePacote (Classe), vai ser utilizada pela classe 
 Pacote
 
