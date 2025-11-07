@@ -53,3 +53,12 @@ cmake --build --preset linux-debug
 g++ -o main ./src/main.cpp
 ```
 
+------------------------------
+
+Executar o programa no linux:
+
+(Utilizar "sudo" porque precisa de permissão para escutar todos os dispositivos)
+
+```
+sudo ./out/build/linux-debug/PacketSniffer
+```
