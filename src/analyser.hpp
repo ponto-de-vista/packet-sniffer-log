@@ -3,8 +3,9 @@
 
 class Analyser
 {
+    string device;
     public:
-        Analyser(); // construtor
+        Analyser(string device); // construtor
 };
 
 #endif

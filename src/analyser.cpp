@@ -1,7 +1,9 @@
 #include "analyser.hpp" // Inclui o header da própria classe
 #include <iostream>     // Inclui o iostream aqui
+using namespace std;
 
-Analyser::Analyser()
+Analyser::Analyser(string dev)
 {
-    std::cout << "Analisador de pacotes!" << "\n";
+    device = dev;
+    cout << "Analisador de pacotes!" << "\n";
 }
