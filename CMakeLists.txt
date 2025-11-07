@@ -4,7 +4,10 @@ project(PacketSniffer VERSION 0.1.0 LANGUAGES C CXX)
 include(CTest)
 enable_testing()
 
-add_executable(PacketSniffer ./src/main.cpp)
+add_executable(PacketSniffer 
+    ./src/main.cpp
+    ./src/analyser.cpp
+)
 
 set_property(TARGET PacketSniffer PROPERTY CXX_STANDARD 17)
 
