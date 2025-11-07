@@ -35,6 +35,21 @@ Pacote
 
 Bibliotecas: 
 
--> Linux: libpcap
+-> Linux: libpcap (sudo apt install libpcap-dev)
 
 -> Windows: npcap
+
+-----------------------------
+
+-> (COM CMAKE) Criar pasta de build e compila, gerando o executavel
+
+```
+cmake --build --preset linux-debug
+```
+
+-> (SEM CMAKE) Gera o build e compila somente a main.cpp
+
+```
+g++ -o main ./src/main.cpp
+```
+
