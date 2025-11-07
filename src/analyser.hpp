@@ -1,11 +1,13 @@
 #ifndef ANALYSER_HPP
 #define ANALYSER_HPP
 
+#include <string>
+
 class Analyser
 {
-    string device;
+    std::string device;
     public:
-        Analyser(string device); // construtor
+        Analyser(std::string device); // construtor
 };
 
 #endif
