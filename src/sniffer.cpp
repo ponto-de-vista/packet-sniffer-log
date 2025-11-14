@@ -38,10 +38,12 @@ bool Sniffer::startCapture() {
     cout << "Loop de captura terminado." << endl;
 
     capturing = false;
+
     if (handle) {
         pcap_close(handle);
         handle = nullptr;
     }
+
     return true;
 }
 
@@ -63,17 +65,21 @@ void Sniffer::processPacket(const struct pcap_pkthdr* header, const u_char* pack
     
     cout << "\n--- Ethernet Header ---" << endl;
     cout << "MAC Origem: ";
+
     for (int i = 0; i < 6; i++) {
         cout << hex << setw(2) << setfill('0') << (int)eth->ether_shost[i];
         if (i < 5) cout << ":";
     }
+
     cout << dec << endl;
     
     cout << "MAC Destino: ";
+
     for (int i = 0; i < 6; i++) {
         cout << hex << setw(2) << setfill('0') << (int)eth->ether_dhost[i];
         if (i < 5) cout << ":";
     }
+
     cout << dec << endl;
     
     u_short ether_type = ntohs(eth->ether_type);
@@ -132,21 +138,18 @@ void Sniffer::processPacket(const struct pcap_pkthdr* header, const u_char* pack
             
         } else if (protocol == IPPROTO_ICMP) {
             cout << "ICMP (1)" << endl;
-            
         } else {
             cout << "Outro (" << protocol << ")" << endl;
         }
         
     } else if (ether_type == ETHERTYPE_IPV6) {
         cout << " (IPv6)" << endl;
-        cout << "IPv6 não implementado neste exemplo" << endl;
-        
+        cout << "IPv6 não implementado." << endl;
     } else if (ether_type == ETHERTYPE_ARP) {
         cout << " (ARP)" << endl;
-        cout << "ARP não implementado neste exemplo" << endl;
-        
+        cout << "ARP não implementado." << endl;
     } else {
-        cout << " (Desconhecido)" << endl;
+        cout << "(Tipo Ethernet Desconhecido)" << endl;
     }
     
     cout << "======================================\n" << endl;
