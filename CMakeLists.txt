@@ -6,7 +6,7 @@ enable_testing()
 
 add_executable(PacketSniffer 
     ./src/main.cpp
-    ./src/analyser.cpp
+    ./src/sniffer.cpp
 )
 
 set_property(TARGET PacketSniffer PROPERTY CXX_STANDARD 17)

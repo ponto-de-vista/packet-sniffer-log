@@ -1,22 +1,32 @@
-#include "analyser.hpp"
+#include "sniffer.hpp"
 #include <iostream>  // Contém classes para input e output, como o 'cout'
 using namespace std; // Permite utilizar as classes diretamente, sem precisar de 'std::cout'
 
 int main(void)
 {
-    //std::string device = "\\Device\\NPF_{4A03F203-76CC-40A6-AED1-6F255E028E81}";
-    std::string device = "any";
+    cout << "=== PACKET SNIFFER ===" << endl;
+    cout << "Bem-vindo ao analisador de pacotes de rede!\n" << endl;
 
     try {
-        Analyser sniffer(device);
+        // Método 1: Seleção interativa (recomendado)
+        string device = Sniffer::selectDeviceInteractive();
         
+        if (device.empty()) {
+            cerr << "Nenhum dispositivo selecionado. Encerrando..." << endl;
+            return 1;
+        }
+        
+        // Cria o sniffer com o dispositivo selecionado
+        Sniffer sniffer(device);
+        
+        // Inicia a captura
         if (!sniffer.startCapture()) {
-            std::cerr << "Falha ao iniciar a captura." << std::endl;
+            cerr << "Falha ao iniciar a captura." << endl;
             return 1;
         }
 
-    } catch (const std::exception& e) {
-        std::cerr << "Exceção: " << e.what() << std::endl;
+    } catch (const exception& e) {
+        cerr << "Exceção: " << e.what() << endl;
         return 1;
     }
     
