@@ -37,6 +37,9 @@ sudo apt install -y build-essential g++ cmake pkg-config
 
 # Instalar biblioteca libpcap para captura de pacotes
 sudo apt install -y libpcap-dev
+
+#instalar qt framework
+sudo apt install qt6-base-dev libxkbcommon-dev
 ```
 
 ### 2. Verificar Instalação
