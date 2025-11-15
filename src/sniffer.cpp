@@ -6,12 +6,13 @@
 #include <netinet/tcp.h>      // Para estruturas TCP
 #include <netinet/udp.h>      // Para estruturas UDP
 #include <arpa/inet.h>        // Para inet_ntoa, ntohs
+#include "gui.hpp"
 
 using namespace std;
 
 // Construtor
-Sniffer::Sniffer(string device)
-    : deviceName(device), handle(nullptr), capturing(false) {
+Sniffer::Sniffer(string device, GUI* gui)
+    : deviceName(device), handle(nullptr), capturing(false), gui(gui) {
     cout << "Sniffer de pacotes iniciado!" << "\n";
 }
 
@@ -61,6 +62,7 @@ void Sniffer::processPacket(const struct pcap_pkthdr* header, const u_char* pack
     cout << "Tamanho real: " << header->len << " bytes" << endl;
     
     // ===== CAMADA ETHERNET (Layer 2) =====
+    const struct ip* ip_header = (struct ip*)(packetData + sizeof(struct ether_header));
     const struct ether_header* eth = (struct ether_header*)packetData;
     
     cout << "\n--- Ethernet Header ---" << endl;
@@ -153,6 +155,15 @@ void Sniffer::processPacket(const struct pcap_pkthdr* header, const u_char* pack
     }
     
     cout << "======================================\n" << endl;
+
+    string ip_origem = inet_ntoa(ip_header->ip_src);
+    string ip_dest = inet_ntoa(ip_header->ip_dst);
+
+    vector<string> colunas;
+    colunas.push_back(ip_origem);
+    colunas.push_back(ip_dest);
+
+    this->gui->insertRow(colunas);
 }
 
 void Sniffer::staticCallback(u_char* user, const struct pcap_pkthdr* header, const u_char* packetData) {

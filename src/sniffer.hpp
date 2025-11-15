@@ -5,6 +5,8 @@
 #include <vector>
 #include <pcap.h>
 
+class GUI;
+
 // Estrutura para armazenar informações de um dispositivo de rede
 struct NetworkDevice {
     std::string name;        // Nome do dispositivo (ex: eth0, wlan0)
@@ -17,6 +19,7 @@ struct NetworkDevice {
 
 class Sniffer {
     private:
+        GUI *gui;
         std::string deviceName;
         pcap_t* handle;
         char* errbuf;
@@ -27,7 +30,7 @@ class Sniffer {
         static void staticCallback(u_char* user, const struct pcap_pkthdr* header, const u_char* packetData);
 
     public:
-        Sniffer(std::string device); // Construtor
+        Sniffer(std::string device, GUI *gui); // Construtor
         ~Sniffer(); // Destrutor
         bool startCapture();
         void stopCapture();
