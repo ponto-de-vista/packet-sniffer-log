@@ -3,7 +3,9 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 #include <pcap.h>
+#include "packet.hpp"
 
 // Estrutura para armazenar informações de um dispositivo de rede
 struct NetworkDevice {
@@ -19,10 +21,18 @@ class Sniffer {
     private:
         std::string deviceName;
         pcap_t* handle;
-        char* errbuf;
+        char errbuf[PCAP_ERRBUF_SIZE];
         bool capturing;
 
-        void processPacket(const struct pcap_pkthdr* header, const u_char* packetData);
+        // Processa dados brutos e constrói um Packet estruturado
+        Packet buildPacket(const struct pcap_pkthdr* header, const u_char* packetData);
+        
+        // Métodos auxiliares para construir cada camada
+        std::unique_ptr<EthernetHeader> parseEthernetHeader(const u_char* data);
+        std::unique_ptr<IPHeader> parseIPHeader(const u_char* data, uint16_t etherType, int& ipHeaderLen);
+        std::unique_ptr<TransportHeader> parseTransportHeader(const u_char* data, 
+                                                               uint8_t protocol, 
+                                                               int ipHeaderLen);
 
         static void staticCallback(u_char* user, const struct pcap_pkthdr* header, const u_char* packetData);
 
