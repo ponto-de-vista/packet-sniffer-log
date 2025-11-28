@@ -11,22 +11,27 @@
 using namespace std;
 
 // Construtor
-Sniffer::Sniffer(string device, GUI* gui)
-    : deviceName(device), handle(nullptr), capturing(false), gui(gui) {
+Sniffer::Sniffer(string device) 
+: deviceName(device), handle(nullptr), capturing(false) 
+{
     cout << "Sniffer de pacotes iniciado!" << "\n";
 }
 
 // Destrutor
-Sniffer::~Sniffer() {
-    if (handle) {
+Sniffer::~Sniffer() 
+{
+    if (handle) 
+    {
         pcap_close(handle);
         cout << "Handle de captura fechado." << endl;
     }
 }
 
-bool Sniffer::startCapture() {
+bool Sniffer::startCapture() 
+{
     handle = pcap_open_live(deviceName.c_str(), BUFSIZ, 1, 1000, errbuf);
-    if (handle == nullptr) {
+    if (handle == nullptr) 
+    {
         cerr << "Erro ao abrir dispositivo: " << errbuf << endl;
         return false;
     }
@@ -40,7 +45,8 @@ bool Sniffer::startCapture() {
 
     capturing = false;
 
-    if (handle) {
+    if (handle) 
+    {
         pcap_close(handle);
         handle = nullptr;
     }
@@ -48,20 +54,24 @@ bool Sniffer::startCapture() {
     return true;
 }
 
-void Sniffer::stopCapture() {
-    if (capturing && handle) {
+void Sniffer::stopCapture() 
+{
+    if (capturing && handle) 
+    {
         cout << "Solicitando parada da captura..." << endl;
         pcap_breakloop(handle);
     }
 }
 
 // ===== PARSE ETHERNET HEADER =====
-unique_ptr<EthernetHeader> Sniffer::parseEthernetHeader(const u_char* data) {
+unique_ptr<EthernetHeader> Sniffer::parseEthernetHeader(const u_char* data) 
+{
     const struct ether_header* eth = (struct ether_header*)data;
     
     // Converte MAC para string
     ostringstream srcMac, dstMac;
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; i++) 
+    {
         srcMac << hex << setw(2) << setfill('0') << (int)eth->ether_shost[i];
         dstMac << hex << setw(2) << setfill('0') << (int)eth->ether_dhost[i];
         if (i < 5) {
@@ -76,8 +86,10 @@ unique_ptr<EthernetHeader> Sniffer::parseEthernetHeader(const u_char* data) {
 }
 
 // ===== PARSE IP HEADER =====
-unique_ptr<IPHeader> Sniffer::parseIPHeader(const u_char* data, uint16_t etherType, int& ipHeaderLen) {
-    if (etherType != ETHERTYPE_IP) {
+unique_ptr<IPHeader> Sniffer::parseIPHeader(const u_char* data, uint16_t etherType, int& ipHeaderLen)
+{
+    if (etherType != ETHERTYPE_IP) 
+    {
         ipHeaderLen = 0;
         return nullptr; // Não é IPv4
     }
@@ -104,7 +116,8 @@ unique_ptr<TransportHeader> Sniffer::parseTransportHeader(const u_char* data,
                                                            int ipHeaderLen) {
     const u_char* transportData = data + sizeof(struct ether_header) + ipHeaderLen;
     
-    if (protocol == IPPROTO_TCP) {
+    if (protocol == IPPROTO_TCP) 
+    {
         const struct tcphdr* tcp = (struct tcphdr*)transportData;
         
         uint16_t srcPort = ntohs(tcp->th_sport);
@@ -115,7 +128,9 @@ unique_ptr<TransportHeader> Sniffer::parseTransportHeader(const u_char* data,
         
         return make_unique<TCPHeader>(srcPort, dstPort, seqNum, ackNum, flags);
         
-    } else if (protocol == IPPROTO_UDP) {
+    } 
+    else if (protocol == IPPROTO_UDP) 
+    {
         const struct udphdr* udp = (struct udphdr*)transportData;
         
         uint16_t srcPort = ntohs(udp->uh_sport);
@@ -124,7 +139,9 @@ unique_ptr<TransportHeader> Sniffer::parseTransportHeader(const u_char* data,
         
         return make_unique<UDPHeader>(srcPort, dstPort, length);
         
-    } else if (protocol == IPPROTO_ICMP) {
+    } 
+    else if (protocol == IPPROTO_ICMP) 
+    {
         return make_unique<ICMPHeader>();
     }
     
@@ -153,13 +170,15 @@ Packet Sniffer::buildPacket(const struct pcap_pkthdr* header, const u_char* pack
     int ipHeaderLen = 0;
     auto ipHeader = parseIPHeader(packetData, etherType, ipHeaderLen);
     
-    if (ipHeader) {
+    if (ipHeader) 
+    {
         uint8_t protocol = ipHeader->getProtocol();
         packet.setIPHeader(move(ipHeader));
         
         // Parse Transport Header
         auto transportHeader = parseTransportHeader(packetData, protocol, ipHeaderLen);
-        if (transportHeader) {
+        if (transportHeader) 
+        {
             packet.setTransportHeader(move(transportHeader));
         }
     }
@@ -178,19 +197,22 @@ void Sniffer::staticCallback(u_char* user, const struct pcap_pkthdr* header, con
 }
 
 // Método estático para listar todos os dispositivos de rede disponíveis
-vector<NetworkDevice> Sniffer::listAvailableDevices() {
+vector<NetworkDevice> Sniffer::listAvailableDevices() 
+{
     vector<NetworkDevice> devices;
     pcap_if_t* alldevs;
     char errbuf[PCAP_ERRBUF_SIZE];
     
     // Busca todos os dispositivos de rede disponíveis
-    if (pcap_findalldevs(&alldevs, errbuf) == -1) {
+    if (pcap_findalldevs(&alldevs, errbuf) == -1) 
+    {
         cerr << "Erro ao buscar dispositivos: " << errbuf << endl;
         return devices; // Retorna vetor vazio
     }
     
     // Itera sobre os dispositivos encontrados
-    for (pcap_if_t* dev = alldevs; dev != nullptr; dev = dev->next) {
+    for (pcap_if_t* dev = alldevs; dev != nullptr; dev = dev->next) 
+    {
         string name = dev->name;
         string description = (dev->description) ? dev->description : "Sem descrição";
         bool hasAddress = (dev->addresses != nullptr);
@@ -205,26 +227,31 @@ vector<NetworkDevice> Sniffer::listAvailableDevices() {
 }
 
 // Método estático para seleção interativa de dispositivo
-string Sniffer::selectDeviceInteractive() {
+string Sniffer::selectDeviceInteractive() 
+{
     cout << "\n========== DISPOSITIVOS DE REDE DISPONÍVEIS ==========" << endl;
     
     vector<NetworkDevice> devices = listAvailableDevices();
     
-    if (devices.empty()) {
+    if (devices.empty()) 
+    {
         cerr << "Nenhum dispositivo de rede encontrado!" << endl;
         return "";
     }
     
     // Exibe a lista de dispositivos
     cout << "\nSelecione um dispositivo:\n" << endl;
-    for (size_t i = 0; i < devices.size(); i++) {
+    for (size_t i = 0; i < devices.size(); i++) 
+    {
         cout << "[" << (i + 1) << "] " << devices[i].name;
         
-        if (!devices[i].description.empty() && devices[i].description != "Sem descrição") {
+        if (!devices[i].description.empty() && devices[i].description != "Sem descrição") 
+        {
             cout << " - " << devices[i].description;
         }
         
-        if (devices[i].hasAddress) {
+        if (devices[i].hasAddress) 
+        {
             cout << " (com IP configurado)";
         }
         
@@ -240,14 +267,19 @@ string Sniffer::selectDeviceInteractive() {
     cin >> choice;
     
     // Valida a escolha
-    if (choice == 0) {
+    if (choice == 0) 
+    {
         cout << "Selecionado: Todos os dispositivos (any)" << endl;
         return "any";
-    } else if (choice > 0 && choice <= static_cast<int>(devices.size())) {
+    } 
+    else if (choice > 0 && choice <= static_cast<int>(devices.size())) 
+    {
         string selectedDevice = devices[choice - 1].name;
         cout << "Selecionado: " << selectedDevice << endl;
         return selectedDevice;
-    } else {
+    } 
+    else
+    {
         cerr << "Opção inválida!" << endl;
         return "";
     }

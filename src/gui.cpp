@@ -3,7 +3,8 @@
 
 using namespace std;
 
-GUI::GUI() {    
+GUI::GUI() 
+{
     this->window.setWindowTitle("Analisador de Pacotes");
     this->window.setMinimumSize(800, 800);
     this->window.setMaximumSize(800, 800);
@@ -24,8 +25,8 @@ GUI::GUI() {
 
     this->tableWidget->setFixedWidth(700);
     this->tableWidget->setFixedHeight(600);
+    
     // Layout
-
     layout->addStretch(1); 
     layout->addWidget(titleLabel, 0, Qt::AlignHCenter);
     layout->addWidget(tableWidget, 0, Qt::AlignHCenter);
@@ -33,33 +34,10 @@ GUI::GUI() {
     layout->addStretch(1);
 
     window.show();
-
-    /*
-
-    try {
-        // Método 1: Seleção interativa (recomendado)
-        string device = Sniffer::selectDeviceInteractive();
-        
-        if (device.empty()) {
-            cerr << "Nenhum dispositivo selecionado. Encerrando..." << endl;
-        }
-        
-        // Cria o sniffer com o dispositivo selecionado
-        Sniffer sniffer(device, this);
-        
-        // Inicia a captura
-        if (!sniffer.startCapture()) {
-            cerr << "Falha ao iniciar a captura." << endl;
-        }
-
-    } catch (const exception& e) {
-        cerr << "Exceção: " << e.what() << endl;
-    }
-
-    */
 }
 
-void GUI::insertRow(vector<string> packets) {
+void GUI::insertRow(vector<string> packets) 
+{
     int row = this->tableWidget->rowCount();
 
     if (row < 2)
@@ -74,6 +52,7 @@ void GUI::insertRow(vector<string> packets) {
     }
 }
 
-GUI::~GUI() {
+GUI::~GUI() 
+{
     cout << "Fechando.";
 }

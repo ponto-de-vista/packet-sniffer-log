@@ -5,8 +5,10 @@
 using namespace std;
 
 // ===== ETHERNET HEADER =====
-string EthernetHeader::getEtherTypeString() const {
-    switch(etherType) {
+string EthernetHeader::getEtherTypeString() const 
+{
+    switch(etherType) 
+    {
         case 0x0800: return "IPv4";
         case 0x0806: return "ARP";
         case 0x86DD: return "IPv6";
@@ -14,18 +16,19 @@ string EthernetHeader::getEtherTypeString() const {
     }
 }
 
-string EthernetHeader::toString() const {
+string EthernetHeader::toString() const 
+{
     ostringstream oss;
     oss << "--- Ethernet Header ---\n";
     oss << "MAC Origem: " << srcMac << "\n";
     oss << "MAC Destino: " << dstMac << "\n";
-    oss << "Tipo: 0x" << hex << setw(4) << setfill('0') << etherType 
-        << dec << " (" << getEtherTypeString() << ")";
+    oss << "Tipo: 0x" << hex << setw(4) << setfill('0') << etherType << dec << " (" << getEtherTypeString() << ")";
     return oss.str();
 }
 
 // ===== IPv4 HEADER =====
-string IPv4Header::toString() const {
+string IPv4Header::toString() const 
+{
     ostringstream oss;
     oss << "--- IP Header ---\n";
     oss << "Versão: IPv" << (int)version << "\n";
@@ -37,7 +40,8 @@ string IPv4Header::toString() const {
 }
 
 // ===== IPv6 HEADER =====
-string IPv6Header::toString() const {
+string IPv6Header::toString() const 
+{
     ostringstream oss;
     oss << "--- IP Header ---\n";
     oss << "Versão: IPv6\n";
@@ -49,7 +53,8 @@ string IPv6Header::toString() const {
 }
 
 // ===== TCP HEADER =====
-string TCPHeader::getFlagsString() const {
+string TCPHeader::getFlagsString() const 
+{
     ostringstream oss;
     bool first = true;
     
@@ -65,7 +70,8 @@ string TCPHeader::getFlagsString() const {
     return oss.str();
 }
 
-string TCPHeader::toString() const {
+string TCPHeader::toString() const 
+{
     ostringstream oss;
     oss << "--- TCP Header ---\n";
     oss << "Porta Origem: " << srcPort << "\n";
@@ -77,7 +83,8 @@ string TCPHeader::toString() const {
 }
 
 // ===== UDP HEADER =====
-string UDPHeader::toString() const {
+string UDPHeader::toString() const 
+{
     ostringstream oss;
     oss << "--- UDP Header ---\n";
     oss << "Porta Origem: " << srcPort << "\n";
@@ -87,7 +94,8 @@ string UDPHeader::toString() const {
 }
 
 // ===== ICMP HEADER =====
-string ICMPHeader::toString() const {
+string ICMPHeader::toString() const 
+{
     ostringstream oss;
     oss << "--- ICMP Header ---\n";
     oss << "Protocolo: ICMP";
@@ -95,29 +103,38 @@ string ICMPHeader::toString() const {
 }
 
 // ===== PACKET =====
-string Packet::getSummary() const {
+string Packet::getSummary() const 
+{
     ostringstream oss;
     
     // Resumo básico
-    if (hasIPHeader() && hasTransportHeader()) {
+    if (hasIPHeader() && hasTransportHeader()) 
+    {
         oss << ipHeader->getSrcIP() << ":" << transportHeader->getSrcPort() 
             << " -> " 
             << ipHeader->getDstIP() << ":" << transportHeader->getDstPort()
             << " [" << transportHeader->getProtocolName() << "]";
-    } else if (hasIPHeader()) {
+    } 
+    else if (hasIPHeader()) 
+    {
         oss << ipHeader->getSrcIP() << " -> " << ipHeader->getDstIP()
             << " [" << ipHeader->getVersionString() << "]";
-    } else if (hasEthernetHeader()) {
+    } 
+    else if (hasEthernetHeader()) 
+    {
         oss << ethernetHeader->getSrcMac() << " -> " << ethernetHeader->getDstMac()
             << " [" << ethernetHeader->getEtherTypeString() << "]";
-    } else {
+    } 
+    else 
+    {
         oss << "Pacote sem headers identificados";
     }
     
     return oss.str();
 }
 
-string Packet::getDetailedInfo() const {
+string Packet::getDetailedInfo() const 
+{
     ostringstream oss;
     
     oss << "\n========== PACOTE CAPTURADO ==========\n";
@@ -128,17 +145,20 @@ string Packet::getDetailedInfo() const {
     oss << "Tamanho real: " << actualLength << " bytes\n";
     
     // Ethernet Header
-    if (hasEthernetHeader()) {
+    if (hasEthernetHeader()) 
+    {
         oss << "\n" << ethernetHeader->toString() << "\n";
     }
     
     // IP Header
-    if (hasIPHeader()) {
+    if (hasIPHeader()) 
+    {
         oss << "\n" << ipHeader->toString() << "\n";
     }
     
     // Transport Header
-    if (hasTransportHeader()) {
+    if (hasTransportHeader()) 
+    {
         oss << "\n" << transportHeader->toString() << "\n";
     }
     
