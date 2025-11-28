@@ -1,9 +1,16 @@
 #include "sniffer.hpp"
+#include "gui.hpp"
+#include <iostream>  // Contém classes para input e output, como o 'cout'
+#include <QApplication>
 #include <iostream>
 using namespace std;
 
 int main(void)
 {
+    QApplication app(argc, argv);
+    GUI* ui = new GUI();
+    app.exec();
+  
     cout << "=== PACKET SNIFFER ===" << endl;
     cout << "Bem-vindo ao analisador de pacotes de rede!\n" << endl;
 

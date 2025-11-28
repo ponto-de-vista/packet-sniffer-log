@@ -7,12 +7,13 @@
 #include <netinet/tcp.h>      // Para estruturas TCP
 #include <netinet/udp.h>      // Para estruturas UDP
 #include <arpa/inet.h>        // Para inet_ntoa, ntohs
+#include "gui.hpp"
 
 using namespace std;
 
 // Construtor
-Sniffer::Sniffer(string device)
-    : deviceName(device), handle(nullptr), capturing(false) {
+Sniffer::Sniffer(string device, GUI* gui)
+    : deviceName(device), handle(nullptr), capturing(false), gui(gui) {
     cout << "Sniffer de pacotes iniciado!" << "\n";
 }
 

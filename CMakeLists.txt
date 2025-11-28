@@ -14,6 +14,7 @@ enable_testing()
 add_executable(PacketSniffer 
     ./src/main.cpp
     ./src/sniffer.cpp
+    ./src/gui.cpp 
     ./src/packet.cpp
 )
 
