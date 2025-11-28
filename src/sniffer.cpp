@@ -7,7 +7,6 @@
 #include <netinet/tcp.h>      // Para estruturas TCP
 #include <netinet/udp.h>      // Para estruturas UDP
 #include <arpa/inet.h>        // Para inet_ntoa, ntohs
-#include "gui.hpp"
 
 using namespace std;
 

@@ -5,7 +5,7 @@
 #include <iostream>
 using namespace std;
 
-int main(void)
+int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     GUI* ui = new GUI();
@@ -24,7 +24,7 @@ int main(void)
         }
         
         // Cria o sniffer com o dispositivo selecionado
-        Sniffer sniffer(device);
+        Sniffer sniffer(device, ui);
         
         // Inicia a captura
         if (!sniffer.startCapture()) {

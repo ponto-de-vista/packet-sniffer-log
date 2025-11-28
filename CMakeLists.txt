@@ -2,11 +2,10 @@ cmake_minimum_required(VERSION 3.10.0)
 project(PacketSniffer VERSION 0.1.0 LANGUAGES C CXX)
 
 # Find the Qt 6 package, requiring the Widgets component
-# COMENTADO: Descomente quando quiser adicionar interface gráfica
-# find_package(Qt6 REQUIRED COMPONENTS Widgets)
-# set(CMAKE_AUTOMOC ON)
-# set(CMAKE_AUTOUIC ON)
-# set(CMAKE_AUTORCC ON)
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
 
 include(CTest)
 enable_testing()
@@ -20,8 +19,7 @@ add_executable(PacketSniffer
 
 set_property(TARGET PacketSniffer PROPERTY CXX_STANDARD 17)
 
-# COMENTADO: Descomente quando quiser usar Qt6
-# target_link_libraries(PacketSniffer PRIVATE Qt6::Widgets)
+target_link_libraries(PacketSniffer PRIVATE Qt6::Widgets)
 
 if(WIN32)
     # --- Configuração do Windows (Npcap) ---
