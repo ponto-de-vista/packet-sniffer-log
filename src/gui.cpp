@@ -55,6 +55,7 @@ GUI::GUI()
     this->table_widget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
     this->table_widget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
     this->table_widget->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
+    this->table_widget->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
     this->table_widget->setFixedWidth(700);
     this->table_widget->setFixedHeight(600);
 

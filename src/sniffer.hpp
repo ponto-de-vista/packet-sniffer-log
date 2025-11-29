@@ -1,6 +1,7 @@
 #ifndef SNIFFER_HPP
 #define SNIFFER_HPP
 
+#include <QObject>
 #include <string>
 #include <vector>
 #include <memory>
@@ -19,7 +20,7 @@ struct NetworkDevice {
         : name(n), description(desc), hasAddress(addr) {}
 };
 
-class Sniffer {
+class Sniffer : public QObject {
     private:
         std::string deviceName;
         pcap_t* handle;
