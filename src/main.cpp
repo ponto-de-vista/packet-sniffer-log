@@ -12,10 +12,20 @@ int main(int argc, char *argv[])
     {
         QProcess process;
         QStringList args;
-        args << "-E" << "-S" << argv[0];
-        
+
+        args << "env";
+        args << "DISPLAY=" + qgetenv("DISPLAY");
+        args << "XAUTHORITY=" + qgetenv("XAUTHORITY");
+        args << argv[0];
+
         process.setProcessChannelMode(QProcess::ForwardedChannels);
-        process.start("sudo", args);
+        process.start("pkexec", args);
+
+        if (!process.waitForStarted()) {
+            qDebug() << "Pkexec failed to start";
+            return 1;
+        }
+
         process.waitForFinished(-1);
         return 0;
     }

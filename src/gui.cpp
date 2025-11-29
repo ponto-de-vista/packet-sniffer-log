@@ -71,6 +71,12 @@ GUI::GUI()
         device_combo->addItem(QString::fromStdString(device.name));
     }
 
+    if (!all_devices.empty())
+    {
+        this->device_selected = all_devices[0].name;
+        device_combo->setCurrentIndex(0);
+    }
+
     QObject::connect(
         device_combo, 
         QOverload<const QString &>::of(&QComboBox::currentTextChanged),
