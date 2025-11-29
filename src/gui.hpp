@@ -14,16 +14,19 @@
 class GUI : public QMainWindow
 {
     private:
-        Sniffer *sniffer;
+        Sniffer *analisador;
         QWidget window;
         QVBoxLayout *layout;
-        QTableWidget *tableWidget;
+        QTableWidget *table_widget;
         int window_size = 800;
+        std::string device_selected;
+        bool has_started = false;
 
     public:
         GUI();
         ~GUI();
         void insertRow(std::vector<std::string> packets);
+        void createSniffer();
 };
 
 #endif

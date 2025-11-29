@@ -1,54 +1,115 @@
 #include "gui.hpp"
+#include "styles.hpp"
 #include <iostream>
+#include <QHeaderView>
+#include <QComboBox>
+#include <QLabel>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+#include <QString>
 
 using namespace std;
 
-GUI::GUI() 
+GUI::GUI()
 {
-    this->window.setWindowTitle("Analisador de Pacotes");
+    QLabel *title_label = new QLabel("Analisador de Pacotes");
+    title_label->setStyleSheet(Styles::titleStyle());
+
+    QPushButton *button = new QPushButton("Analisar!");
+    button->setStyleSheet(Styles::buttonAnalyzeStyle());
+
+    QObject::connect(button, &QPushButton::clicked, this, [this, button]() 
+    {
+        if (this->has_started)
+        {
+            this->has_started = false;
+            button->setText("Analisar!");
+            button->setStyleSheet(Styles::buttonAnalyzeStyle());
+            
+            this->analisador->stopCapture();
+
+            delete this->analisador;
+            this->analisador = nullptr;
+        }
+        else
+        {
+            this->has_started = true;
+            button->setText("Parar");
+            button->setStyleSheet(Styles::buttonStopStyle());
+
+            // Iniciar o Analisador de pacotes
+            this->analisador = new Sniffer(this->device_selected);
+            this->analisador->startCapture();
+        }
+    });
+
+    /*
+        TABELA
+    */
+
+    this->table_widget = new QTableWidget(this);
+    this->table_widget->setColumnCount(2);
+    this->table_widget->setHorizontalHeaderLabels({"Origem", "Dest"});
+    this->table_widget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+    this->table_widget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    this->table_widget->setFixedWidth(700);
+    this->table_widget->setFixedHeight(600);
+
+    /*
+        SELETOR DE DISPOSITIVOS
+    */
+
+    QComboBox *device_combo = new QComboBox(this);
+    this->device_selected = "";
+
+    vector<NetworkDevice> all_devices = Sniffer::listAvailableDevices();
+
+    for (const auto &device : all_devices) 
+    {
+        device_combo->addItem(QString::fromStdString(device.name));
+    }
+
+    QObject::connect(
+        device_combo, 
+        QOverload<const QString &>::of(&QComboBox::currentTextChanged),
+        this, 
+        [this](const QString &text) 
+        {
+            this->device_selected = text.toStdString();
+            this->window.setWindowTitle(QString("Analisador de pacotes: ") + text);
+        }
+    );
+
+    /*
+        INSERE OS COMPONENTES VISUAIS
+    */
+
     this->window.setMinimumSize(800, 800);
     this->window.setMaximumSize(800, 800);
 
-    QLabel *titleLabel = new QLabel("Analisador de Pacotes");
-
-    titleLabel->setStyleSheet("font-size: 24px; font-weight: bold;");
-
-    QPushButton *button = new QPushButton("Analisar!");
-
     this->layout = new QVBoxLayout(&window);
-
-    this->tableWidget = new QTableWidget(this);
-
-    this->tableWidget->setColumnCount(2);
-    this->tableWidget->setHorizontalHeaderLabels({"Origem", "Dest"});
-    this->tableWidget->resizeColumnsToContents();
-
-    this->tableWidget->setFixedWidth(700);
-    this->tableWidget->setFixedHeight(600);
-    
-    // Layout
-    layout->addStretch(1); 
-    layout->addWidget(titleLabel, 0, Qt::AlignHCenter);
-    layout->addWidget(tableWidget, 0, Qt::AlignHCenter);
-
-    layout->addStretch(1);
-
-    window.show();
+    this->layout->addWidget(title_label, 0, Qt::AlignHCenter);
+    this->layout->addWidget(device_combo, 0, Qt::AlignHCenter);
+    this->layout->addWidget(button, 0, Qt::AlignHCenter);
+    this->layout->addWidget(table_widget, 0, Qt::AlignHCenter);
+    this->window.show();
 }
 
 void GUI::insertRow(vector<string> packets) 
 {
-    int row = this->tableWidget->rowCount();
+    int row = this->table_widget->rowCount();
 
     if (row < 2)
     {
-        this->tableWidget->insertRow(row);
+        this->table_widget->insertRow(row);
 
         QTableWidgetItem *origemItem = new QTableWidgetItem(QString::fromStdString(packets[0]));
         QTableWidgetItem *destItem = new QTableWidgetItem(QString::fromStdString(packets[1]));
 
-        this->tableWidget->setItem(row, 0, origemItem);
-        this->tableWidget->setItem(row, 1, destItem);
+        this->table_widget->setItem(row, 0, origemItem);
+        this->table_widget->setItem(row, 1, destItem);
     }
 }
 

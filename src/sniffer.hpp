@@ -6,6 +6,8 @@
 #include <memory>
 #include <pcap.h>
 #include "packet.hpp"
+#include <thread>
+#include <atomic>
 
 // Estrutura para armazenar informações de um dispositivo de rede
 struct NetworkDevice {
@@ -24,6 +26,10 @@ class Sniffer {
         char errbuf[PCAP_ERRBUF_SIZE];
         bool capturing;
 
+        // Novo membro para a thread de captura
+        std::thread captureThread;
+        std::atomic<bool> shouldStop{false};
+
         // Processa dados brutos e constrói um Packet estruturado
         Packet buildPacket(const struct pcap_pkthdr* header, const u_char* packetData);
         
@@ -35,6 +41,8 @@ class Sniffer {
                                                                int ipHeaderLen);
 
         static void staticCallback(u_char* user, const struct pcap_pkthdr* header, const u_char* packetData);
+
+        void captureLoop();  // Novo método para rodar em thread
 
     public:
         Sniffer(std::string device); // Construtor

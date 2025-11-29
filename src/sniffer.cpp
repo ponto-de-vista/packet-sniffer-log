@@ -38,20 +38,19 @@ bool Sniffer::startCapture()
 
     cout << "Captura iniciada. Pressione Ctrl+C para parar." << endl;
     capturing = true;
-
-    pcap_loop(handle, -1, staticCallback, reinterpret_cast<u_char*>(this));
-
-    cout << "Loop de captura terminado." << endl;
-
-    capturing = false;
-
-    if (handle) 
-    {
-        pcap_close(handle);
-        handle = nullptr;
-    }
-
+    shouldStop = false;
+    
+    // Inicia captura em thread separada
+    captureThread = std::thread(&Sniffer::captureLoop, this);
+    
     return true;
+}
+
+void Sniffer::captureLoop()
+{
+    pcap_loop(handle, -1, staticCallback, reinterpret_cast<u_char*>(this));
+    cout << "Loop de captura terminado." << endl;
+    capturing = false;
 }
 
 void Sniffer::stopCapture() 
@@ -60,6 +59,17 @@ void Sniffer::stopCapture()
     {
         cout << "Solicitando parada da captura..." << endl;
         pcap_breakloop(handle);
+        
+        if (captureThread.joinable()) 
+        {
+            captureThread.join();
+        }
+        
+        if (handle) 
+        {
+            pcap_close(handle);
+            handle = nullptr;
+        }
     }
 }
 
@@ -193,7 +203,9 @@ void Sniffer::staticCallback(u_char* user, const struct pcap_pkthdr* header, con
     Packet packet = sniffer->buildPacket(header, packetData);
     
     // Exibe as informações detalhadas do pacote
-    cout << packet.getDetailedInfo() << endl;
+    //cout << packet.getDetailedInfo() << endl;
+
+    // cout << sniffer->deviceName;
 }
 
 // Método estático para listar todos os dispositivos de rede disponíveis
