@@ -11,10 +11,10 @@
 using namespace std;
 
 // Construtor
-Sniffer::Sniffer(string device) 
-: deviceName(device), handle(nullptr), capturing(false) 
+Sniffer::Sniffer(string device, QObject *parent) 
+: QObject(parent), deviceName(device), handle(nullptr), capturing(false)
 {
-    cout << "Sniffer de pacotes iniciado!" << "\n";
+    cout << "Analisador de pacotes iniciado!" << "\n";
 }
 
 // Destrutor
@@ -201,11 +201,31 @@ void Sniffer::staticCallback(u_char* user, const struct pcap_pkthdr* header, con
     
     // Constrói o pacote estruturado
     Packet packet = sniffer->buildPacket(header, packetData);
-    
-    // Exibe as informações detalhadas do pacote
-    //cout << packet.getDetailedInfo() << endl;
 
-    // cout << sniffer->deviceName;
+    QString src = "Desc.";
+    QString dst = "Desc.";
+    QString proto = "N/A";
+
+    if (packet.hasIPHeader())
+    {
+        src = QString::fromStdString(packet.getIPHeader()->getSrcIP());
+        dst = QString::fromStdString(packet.getIPHeader()->getDstIP());
+        proto = QString::fromStdString(packet.getIPHeader()->getVersionString());
+    } 
+    else if (packet.hasEthernetHeader())
+    {
+        src = QString::fromStdString(packet.getEthernetHeader()->getSrcMac());
+        dst = QString::fromStdString(packet.getEthernetHeader()->getDstMac());
+        proto = "Eth";
+    }
+
+    if (packet.hasTransportHeader()) 
+    {
+        proto = QString::fromStdString(packet.getTransportHeader()->getProtocolName());
+    }
+
+    emit sniffer->packetCaptured(src, dst, proto, header->len);
+
 }
 
 // Método estático para listar todos os dispositivos de rede disponíveis
@@ -237,63 +257,3 @@ vector<NetworkDevice> Sniffer::listAvailableDevices()
     
     return devices;
 }
-
-// Método estático para seleção interativa de dispositivo
-string Sniffer::selectDeviceInteractive() 
-{
-    cout << "\n========== DISPOSITIVOS DE REDE DISPONÍVEIS ==========" << endl;
-    
-    vector<NetworkDevice> devices = listAvailableDevices();
-    
-    if (devices.empty()) 
-    {
-        cerr << "Nenhum dispositivo de rede encontrado!" << endl;
-        return "";
-    }
-    
-    // Exibe a lista de dispositivos
-    cout << "\nSelecione um dispositivo:\n" << endl;
-    for (size_t i = 0; i < devices.size(); i++) 
-    {
-        cout << "[" << (i + 1) << "] " << devices[i].name;
-        
-        if (!devices[i].description.empty() && devices[i].description != "Sem descrição") 
-        {
-            cout << " - " << devices[i].description;
-        }
-        
-        if (devices[i].hasAddress) 
-        {
-            cout << " (com IP configurado)";
-        }
-        
-        cout << endl;
-    }
-    
-    cout << "\n[0] Capturar de todos os dispositivos (any)" << endl;
-    cout << "\n======================================================" << endl;
-    
-    // Solicita a escolha do usuário
-    int choice;
-    cout << "\nDigite o número do dispositivo: ";
-    cin >> choice;
-    
-    // Valida a escolha
-    if (choice == 0) 
-    {
-        cout << "Selecionado: Todos os dispositivos (any)" << endl;
-        return "any";
-    } 
-    else if (choice > 0 && choice <= static_cast<int>(devices.size())) 
-    {
-        string selectedDevice = devices[choice - 1].name;
-        cout << "Selecionado: " << selectedDevice << endl;
-        return selectedDevice;
-    } 
-    else
-    {
-        cerr << "Opção inválida!" << endl;
-        return "";
-    }
-}
-

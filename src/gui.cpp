@@ -27,20 +27,28 @@ GUI::GUI()
             this->has_started = false;
             button->setText("Analisar!");
             button->setStyleSheet(Styles::buttonAnalyzeStyle());
-            
-            this->analisador->stopCapture();
 
-            delete this->analisador;
-            this->analisador = nullptr;
+            
+            if (this->analisador) 
+            {
+                this->analisador->disconnect();
+                this->analisador->stopCapture();
+                delete this->analisador;
+                this->analisador = nullptr;
+            }
         }
         else
         {
+            this->table_widget->setRowCount(0);
+
             this->has_started = true;
             button->setText("Parar");
             button->setStyleSheet(Styles::buttonStopStyle());
 
-            // Iniciar o Analisador de pacotes
             this->analisador = new Sniffer(this->device_selected);
+
+            QObject::connect(this->analisador, &Sniffer::packetCaptured, this, &GUI::updateTable);
+
             this->analisador->startCapture();
         }
     });
@@ -105,20 +113,20 @@ GUI::GUI()
     this->window.show();
 }
 
-void GUI::insertRow(vector<string> packets) 
+void GUI::updateTable(QString src, QString dst, QString protocol, int length) 
 {
     int row = this->table_widget->rowCount();
+    this->table_widget->insertRow(row);
 
-    if (row < 2)
-    {
-        this->table_widget->insertRow(row);
+    QTableWidgetItem *srcItem = new QTableWidgetItem(src);
+    QTableWidgetItem *dstItem = new QTableWidgetItem(dst);
+    QTableWidgetItem *protoItem = new QTableWidgetItem(protocol);
+    QTableWidgetItem *lenItem = new QTableWidgetItem(QString::number(length));
 
-        QTableWidgetItem *origemItem = new QTableWidgetItem(QString::fromStdString(packets[0]));
-        QTableWidgetItem *destItem = new QTableWidgetItem(QString::fromStdString(packets[1]));
-
-        this->table_widget->setItem(row, 0, origemItem);
-        this->table_widget->setItem(row, 1, destItem);
-    }
+    this->table_widget->setItem(row, 0, srcItem);
+    this->table_widget->setItem(row, 1, dstItem);
+    this->table_widget->setItem(row, 2, protoItem);
+    this->table_widget->setItem(row, 3, lenItem);
 }
 
 GUI::~GUI() 

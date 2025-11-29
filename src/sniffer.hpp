@@ -21,6 +21,8 @@ struct NetworkDevice {
 };
 
 class Sniffer : public QObject {
+    Q_OBJECT
+
     private:
         std::string deviceName;
         pcap_t* handle;
@@ -46,7 +48,7 @@ class Sniffer : public QObject {
         void captureLoop();  // Novo método para rodar em thread
 
     public:
-        Sniffer(std::string device); // Construtor
+        Sniffer(std::string device, QObject *parent = nullptr); // Construtor
         ~Sniffer(); // Destrutor
         bool startCapture();
         void stopCapture();
@@ -54,6 +56,9 @@ class Sniffer : public QObject {
         // Métodos estáticos para gerenciar dispositivos (não dependem de instância)
         static std::vector<NetworkDevice> listAvailableDevices();
         static std::string selectDeviceInteractive();
+
+    signals:
+        void packetCaptured(QString src, QString dst, QString protocol, int length);
 };
 
 #endif

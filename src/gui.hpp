@@ -25,8 +25,9 @@ class GUI : public QMainWindow
     public:
         GUI();
         ~GUI();
-        void insertRow(std::vector<std::string> packets);
-        void createSniffer();
+
+    public slots:
+        void updateTable(QString src, QString dst, QString protocol, int length);
 };
 
 #endif
